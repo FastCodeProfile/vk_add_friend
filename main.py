@@ -16,7 +16,7 @@ class VK:
 
         :param token: Токен аккаунта ВК
         """
-        self.token = token
+        self.headers = {'Authorization': f'Bearer {token}'}
 
     async def add_friend(self, user_id: str) -> tuple[bool, str | None]:
         """
@@ -24,8 +24,7 @@ class VK:
 
         :return: tuple[bool, str | None]
         """
-        headers = {'Authorization': f'Bearer {self.token}'}
-        async with aiohttp.ClientSession(headers=headers) as session:
+        async with aiohttp.ClientSession(headers=self.headers) as session:
             async with session.get(f'https://api.vk.com/method/friends.add?user_id={user_id}&v=5.131') as response:
                 json_response = await response.json()
                 if 'error' in json_response:
