@@ -1,5 +1,4 @@
 import json
-import random
 import asyncio
 from contextlib import suppress
 
@@ -27,7 +26,7 @@ class VK:
         """
         headers = {'Authorization': f'Bearer {self.token}'}
         async with aiohttp.ClientSession(headers=headers) as session:
-            async with session.get(f'https://api.vk.com/method/friends.add?user_id={user_id}?v=5.131') as response:
+            async with session.get(f'https://api.vk.com/method/friends.add?user_id={user_id}&v=5.131') as response:
                 json_response = await response.json()
                 if 'error' in json_response:
                     return False, json_response["error"]["error_msg"]
@@ -54,7 +53,10 @@ async def main() -> None:
     input_data = file_input()  # Получаем словарь с данными аккаунтов
     for key in input_data.keys():  # Перебираем словарь по его ключам
         account = input_data[key]
-        next_account = input_data[str(int(key) + 1)]
+        try:
+            next_account = input_data[str(int(key) + 1)]
+        except KeyError:
+            break
         vk = VK(token=account["access_token"])  # Инициализируем класс
         next_vk = VK(token=next_account["access_token"])  # Инициализируем класс
         status, response = await vk.add_friend(next_account["user_id"])  # Отправляем заявку в друзья
